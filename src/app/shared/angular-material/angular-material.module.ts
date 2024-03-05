@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import {TextFieldModule} from '@angular/cdk/text-field';
 
-
+const modules = [MatSidenavModule, MatButtonModule, MatIconModule, TextFieldModule];
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule
-  ]
+  imports: [...modules],
+  exports: [...modules],
 })
-export class AngularMaterialModule { }
+export class AngularMaterialModule {}
+
