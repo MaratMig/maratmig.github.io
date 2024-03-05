@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/reflectiz'),
+      dir: require('path').join(__dirname, './coverage/maratmig.github.io'),
       subdir: '.',
       reporters: [
         { type: 'html' },
