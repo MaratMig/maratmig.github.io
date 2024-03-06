@@ -1,0 +1,31 @@
+.main-container {
+  display: flex;
+  width: 100%;
+
+  .side-nav {
+    width: 350px;
+    min-width: 230px;
+    min-height: calc(100vh - 70px);
+    background-color: #113c60;
+    color: #fff;
+    box-shadow: 5px 5px 5px #939393;
+
+  }
+  .main {
+    padding: 30px;
+  }
+  // @media only screen and (max-width: 980px) {
+  //   width: 696px;
+  // }
+  // @media screen and (max-width: 1280px) {
+  //   width: 980px;
+  // }
+  // @media screen and (max-width: 1920px) {
+  //   width: 1280px;
+  // }
+  // @media screen and (min-width: 3840px) {
+  //   width: 2560px;
+  // }
+
+
+}
