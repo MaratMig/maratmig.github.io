@@ -1,8 +1,8 @@
 export interface Alert {
-  Name: string;
+  name: string;
   severity: number;
   description: string;
   date: number;
   source: string;
-  id: number;
+  id: string;
 }

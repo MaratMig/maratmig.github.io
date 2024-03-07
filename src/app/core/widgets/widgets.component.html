@@ -1,32 +1,25 @@
 <div class="widget-container">
-  <div class="widget green">
+  <div *ngFor="let alert of alerts" class="widget" [ngClass]="getColorClass(alert.severity)">
     <div class="widget-header">
-      <div class="icon">
+      <!-- <div class="icon">
         <fa-icon [icon]="faSearchLocation"></fa-icon>
-      </div>
-      <div class="widget-name">Alert Super 1</div>
+      </div> -->
+      <div class="widget-name">{{ alert.name }}</div>
     </div>
     <div class="alert-data">
-      <div class="severity">Severity: 10</div>
+      <div class="severity">Severity: {{ alert.severity }}</div>
       <div class="description">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque dolorem
-        delectus odio? Numquam accusamus ipsam vero perferendis quo tempore,
-        explicabo doloremque iusto odio officia distinctio dolor aliquid,
-        laborum architecto eius.
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque dolorem
-        delectus odio? Numquam accusamus ipsam vero perferendis quo tempore,
-        explicabo doloremque iusto odio officia distinctio dolor aliquid,
-        laborum architecto eius.
+        {{ alert.description }}
       </div>
       <div class="date-source">
-        <div class="date">12/01/2023</div>
-        <div class="source">www.cabana.com</div>
+        <div class="date">{{ alert.date * 1000 | date }}</div>
+        <div class="source">{{ alert.source }}</div>
       </div>
-      <div class="id">ID: 56465465454</div>
+      <div class="id">ID: {{ alert.id }}</div>
     </div>
   </div>
 
-  <div class="widget yellow">
+  <!-- <div class="widget yellow">
     <div class="icon">
       <fa-icon [icon]="faShoppingBag"></fa-icon>
     </div>
@@ -66,11 +59,10 @@
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque dolorem
         delectus odio? Numquam accusamus ipsam vero perferendis quo tempore,
         explicabo doloremque iusto odio officia distinctio dolor aliquid,
-        laborum architecto eius.
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque dolorem
-        delectus odio? Numquam accusamus ipsam vero perferendis quo tempore,
-        explicabo doloremque iusto odio officia distinctio dolor aliquid,
-        laborum architecto eius.
+        laborum architecto eius. Lorem ipsum dolor, sit amet consectetur
+        adipisicing elit. Atque dolorem delectus odio? Numquam accusamus ipsam
+        vero perferendis quo tempore, explicabo doloremque iusto odio officia
+        distinctio dolor aliquid, laborum architecto eius.
       </div>
       <div class="date-source">
         <div class="date">12/01/2023</div>
@@ -92,11 +84,10 @@
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque dolorem
         delectus odio? Numquam accusamus ipsam vero perferendis quo tempore,
         explicabo doloremque iusto odio officia distinctio dolor aliquid,
-        laborum architecto eius.
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Atque dolorem
-        delectus odio? Numquam accusamus ipsam vero perferendis quo tempore,
-        explicabo doloremque iusto odio officia distinctio dolor aliquid,
-        laborum architecto eius.
+        laborum architecto eius. Lorem ipsum dolor, sit amet consectetur
+        adipisicing elit. Atque dolorem delectus odio? Numquam accusamus ipsam
+        vero perferendis quo tempore, explicabo doloremque iusto odio officia
+        distinctio dolor aliquid, laborum architecto eius.
       </div>
       <div class="date-source">
         <div class="date">12/01/2023</div>
@@ -104,5 +95,5 @@
       </div>
       <div class="id">ID: 56465465454</div>
     </div>
-  </div>
+  </div> -->
 </div>
