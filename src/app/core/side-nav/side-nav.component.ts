@@ -7,6 +7,9 @@ import {
   faMoneyBill,
   faAddressBook,
   faHands,
+  faHome,
+  faChartBar,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -22,6 +25,9 @@ export class SideNavComponent implements OnInit {
   faMoneyBill = faMoneyBill;
   faAddressBook = faAddressBook;
   faHands = faHands;
+  faHome = faHome;
+  faChartBar = faChartBar;
+  faUser = faUser;
 
   constructor() {}
 

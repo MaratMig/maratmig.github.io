@@ -6,6 +6,7 @@ import { SideNavComponent } from './side-nav/side-nav.component';
 import { WidgetsComponent } from './widgets/widgets.component';
 import { FiltersComponent } from './filters/filters.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AngularMaterialModule } from '../shared/angular-material/angular-material.module';
 
 
 
@@ -19,7 +20,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   ],
   imports: [
     CommonModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    AngularMaterialModule
   ],
   exports: [
     MainComponent,
