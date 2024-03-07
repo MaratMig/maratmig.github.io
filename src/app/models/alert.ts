@@ -5,4 +5,6 @@ export interface Alert {
   date: number;
   source: string;
   id: string;
+  active: boolean;
 }
+

@@ -17,10 +17,10 @@ import { AngularMaterialModule } from './shared/angular-material/angular-materia
     BrowserModule,
     AppRoutingModule,
     FontAwesomeModule,
+    AngularMaterialModule,
     BrowserAnimationsModule,
     CoreModule,
     HttpClientModule,
-    AngularMaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent]

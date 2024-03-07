@@ -9,7 +9,8 @@ import { AlertsStore } from '../services/alerts.store';
   styleUrls: ['./main.component.scss'],
 })
 export class MainComponent implements OnInit {
-  alerts$: Observable<Alert[]>;
+  activeAlerts$: Observable<Alert[]>;
+  dismissedAlerts$: Observable<Alert[]>;
 
   constructor(private alertsStore: AlertsStore) {}
 
@@ -18,6 +19,17 @@ export class MainComponent implements OnInit {
   }
 
   getAlerts() {
-    this.alerts$ = this.alertsStore.courses$;
+    this.activeAlerts$ = this.alertsStore.filterByActivity(true);
+    this.dismissedAlerts$ = this.alertsStore.filterByActivity(false);
+  }
+
+  sortBy(category: string) {
+    console.log('category :  ', category);
+    this.alertsStore.sortByCategory(category);
+    this.getAlerts();
+  }
+
+  dismissAlert(alert: Alert) {
+    this.alertsStore.dismissAlert(alert);
   }
 }

@@ -7,6 +7,7 @@ import { WidgetsComponent } from './widgets/widgets.component';
 import { FiltersComponent } from './filters/filters.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AngularMaterialModule } from '../shared/angular-material/angular-material.module';
+import { AlertCardsComponent } from './alert-cards/alert-cards.component';
 
 
 
@@ -16,7 +17,8 @@ import { AngularMaterialModule } from '../shared/angular-material/angular-materi
     HeaderComponent,
     SideNavComponent,
     WidgetsComponent,
-    FiltersComponent
+    FiltersComponent,
+    AlertCardsComponent
   ],
   imports: [
     CommonModule,

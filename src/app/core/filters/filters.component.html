@@ -1,3 +1,8 @@
 <div class="filters-container">
-
+  <button mat-raised-button color="primary" (click)="filter.emit('severityDesc')">severity Desc</button>
+  <button mat-raised-button color="primary" (click)="filter.emit('severityAsc')">severity Asc</button>
+  <button mat-raised-button color="accent" (click)="filter.emit('source')">source</button>
+  <button mat-raised-button color="accent" (click)="filter.emit('name')">name</button>
+  <button mat-raised-button color="warn" (click)="filter.emit('dateDesc')">date Desc</button>
+  <button mat-raised-button color="warn" (click)="filter.emit('dateAsc')">date Asc</button>
 </div>

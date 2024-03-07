@@ -1,6 +1,16 @@
+:host {
+  display: flex;
+  width: 100%;
+}
+
 .filters-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
   height: 4rem;
-  margin: 1rem 1rem;
-  border:1px solid rgb(47, 67, 220);
+  width: 100%;
+  margin: 1rem 0;
+  border: 1px solid rgba(84, 86, 101, 0.3);
   border-radius: 0.5rem;
+  box-shadow: 3px 3px 3px #939393;
 }
