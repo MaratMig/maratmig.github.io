@@ -1,5 +1,5 @@
 <div class="main">
-  <app-filters (filter)="sortBy($event)"></app-filters>
+  <app-filters (clearDismissed)="clearDismissed()" (filter)="sortBy($event)"></app-filters>
   <app-widgets
     [activeAlerts]="activeAlerts$ | async"
     [dismissedAlerts]="dismissedAlerts$ | async"

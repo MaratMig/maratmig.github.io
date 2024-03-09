@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Alert } from 'src/app/models/alert';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AlertsStore } from '../services/alerts.store';
 
 @Component({
@@ -20,7 +20,9 @@ export class MainComponent implements OnInit {
 
   getAlerts() {
     this.activeAlerts$ = this.alertsStore.filterByActivity(true);
-    this.dismissedAlerts$ = this.alertsStore.filterByActivity(false);
+    this.dismissedAlerts$ = this.alertsStore
+      .filterByActivity(false)
+      .pipe(tap((al) => console.log('al', al)));
   }
 
   sortBy(category: string) {
@@ -31,5 +33,11 @@ export class MainComponent implements OnInit {
 
   dismissAlert(alert: Alert) {
     this.alertsStore.dismissAlert(alert);
+    this.getAlerts();
+  }
+
+  clearDismissed() {
+    this.alertsStore.clearDismissed();
+    this.getAlerts();
   }
 }
