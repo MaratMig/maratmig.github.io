@@ -32,6 +32,7 @@ export class LoginFormComponent implements OnInit {
       const { email, password } = this.loginForm.value;
       this.authService
         .login(email, password)
+        .pipe(takeUntil(this.unsubscribe$))
         .subscribe((logingResult) => {
           console.log('logingResult ', logingResult);
           logingResult === true

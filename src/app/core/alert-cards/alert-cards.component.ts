@@ -14,6 +14,7 @@ export class AlertCardsComponent {
   @Output()
   alertDismissed = new EventEmitter<Alert>();
 
+  //add enum
   getColorClass(severity: number): string {
     switch (severity) {
       case 1:
