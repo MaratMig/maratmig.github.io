@@ -8,6 +8,7 @@
   width: 100%;
   min-width: 300px;
 }
+
 .card {
   background-color: 5px 5px 5px #939393;
   box-shadow: 5px 5px 5px #939393;
@@ -22,4 +23,8 @@ mat-card-content {
 .button {
   display: flex;
   justify-content: flex-end;
+}
+
+.creds {
+  margin-top: 50px;
 }

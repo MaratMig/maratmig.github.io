@@ -2,15 +2,22 @@ import { Injectable } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
+  Subject,
   combineLatest,
   interval,
-  of,
   throwError,
 } from 'rxjs';
-import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
+import {
+  catchError,
+  map,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Alert } from 'src/app/models/alert';
 import { LocalStorageService } from './local-storage.service';
+import { Categories } from 'src/app/models/categories';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +25,7 @@ import { LocalStorageService } from './local-storage.service';
 export class AlertsStore {
   baseUrl = 'http://localhost:3000/api';
   readonly DISMISSED_ALERTS = 'dismissedAlerts';
+  private unsubscribe$ = new Subject<void>();
 
   private alertsSubject: BehaviorSubject<Alert[]> = new BehaviorSubject<
     Alert[]
@@ -34,7 +42,6 @@ export class AlertsStore {
   }
 
   private loadAlerts(): void {
-    // NOTE: ADD POLLING !!!!
     const activeAlerts$ = this.http.get<Alert[]>(`${this.baseUrl}/alerts`).pipe(
       tap((alerts) => this.alertsSubject.next(alerts)),
       catchError((err) => {
@@ -43,10 +50,28 @@ export class AlertsStore {
         return throwError(() => new Error(message));
       })
     );
-    const dismissedAlerts$ = this.localStorage.loadData(this.DISMISSED_ALERTS);
 
+    const dismissedAlerts$ = this.localStorage.loadData(this.DISMISSED_ALERTS);
+    this.combineActiveAndDismissed(activeAlerts$, dismissedAlerts$);
+  }
+
+  private startPolling() {
+    interval(10000)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        map(() => {
+          this.loadAlerts();
+        })
+      )
+      .subscribe((alerts) => console.log('ALERTS'));
+  }
+
+  combineActiveAndDismissed(
+    activeAlerts$: Observable<Alert[]>,
+    dismissedAlerts$: Observable<Alert[]>
+  ) {
     combineLatest([activeAlerts$, dismissedAlerts$])
-      .pipe(take(1))
+      .pipe(take(1), takeUntil(this.unsubscribe$))
       .subscribe(([active, dismissed]) => {
         const alerts = active.concat(dismissed);
         console.log('alerts ', alerts);
@@ -54,40 +79,42 @@ export class AlertsStore {
       });
   }
 
-  private startPolling() {
-    interval(10000).pipe(
-      map(() => {
-        this.loadAlerts();
-      })
-    ).subscribe(alerts => console.log('ALERTS'));
-  }
-
-  dismissAlert(dismissedAlert: Alert) {
+  dismissAlert(alert: Alert) {
     console.log('dismissedAlert');
     const alerts = this.alertsSubject.getValue();
-    // console.log('newAlerts ', alerts);
-    const index = alerts.findIndex((alert) => alert.id === dismissedAlert.id);
-    const newAlert: Alert = {
-      ...alerts[index],
-      active: false,
-    };
+    const index = this.findIndexById(alert.id, alerts);
+    const dismissedAlert = this.createDismissedAlert(alerts[index]);
+    const newAlerts = this.createNewAlers(alerts, dismissedAlert, index);
+
+    this.updateLocalStorage(dismissedAlert);
+    this.sendAlertDismissRequest(dismissedAlert, newAlerts);
+  }
+
+  private findIndexById(alertId: string, alerts: Alert[]): number {
+    return alerts.findIndex((alert) => alert.id === alertId);
+  }
+
+  private createDismissedAlert(originalAlert: Alert): Alert {
+    return { ...originalAlert, active: false };
+  }
+
+  private createNewAlers(
+    alerts: Alert[],
+    newAlert: Alert,
+    index: number
+  ): Alert[] {
     const newAlerts: Alert[] = alerts.slice(0);
     newAlerts[index] = newAlert;
-    // console.log('newAlerts ', newAlerts);
-    this.alerts$ = of(newAlerts);
-    this.alertsSubject.next(newAlerts);
-    this.localStorage
-      .loadData(this.DISMISSED_ALERTS)
-      .pipe(take(1))
-      .subscribe((dismissesAlerts) => {
-        dismissesAlerts.push(newAlert);
-        this.localStorage.saveData(this.DISMISSED_ALERTS, dismissesAlerts);
-      });
 
-    return this.http
+    return newAlerts;
+  }
+
+  sendAlertDismissRequest(newAlert: Alert, newAlerts: Alert[]) {
+    this.http
       .put<Alert>(`${this.baseUrl}/alerts/${newAlert.id}`, newAlert)
       .pipe(
         take(1),
+        takeUntil(this.unsubscribe$),
         catchError((err) => {
           const message = 'Could not save alert';
           console.log(message, err);
@@ -100,6 +127,16 @@ export class AlertsStore {
       });
   }
 
+  updateLocalStorage(newAlert: Alert) {
+    this.localStorage
+      .loadData(this.DISMISSED_ALERTS)
+      .pipe(take(1), takeUntil(this.unsubscribe$))
+      .subscribe((dismissesAlerts) => {
+        dismissesAlerts.push(newAlert);
+        this.localStorage.saveData(this.DISMISSED_ALERTS, dismissesAlerts);
+      });
+  }
+
   filterByActivity(active: boolean): Observable<Alert[]> {
     return this.alerts$.pipe(
       map((alerts) => alerts.filter((alert) => alert.active == active))
@@ -108,22 +145,22 @@ export class AlertsStore {
 
   sortByCategory(category: string) {
     switch (category) {
-      case 'severityAsc':
+      case Categories.SeverityAsc:
         this.sortNumeric('severity', 'Asc');
         break;
-      case 'severityDesc':
+      case Categories.SeverityDesc:
         this.sortNumeric('severity', 'Desc');
         break;
-      case 'name':
+      case Categories.name:
         this.sortText('name');
         break;
-      case 'source':
+      case Categories.source:
         this.sortText('source');
         break;
-      case 'dateDesc':
+      case Categories.dateDesc:
         this.sortNumeric('date', 'Desc');
         break;
-      case 'dateAsc':
+      case Categories.dateAsc:
         this.sortNumeric('date', 'Asc');
         break;
     }
@@ -136,13 +173,13 @@ export class AlertsStore {
     this.alerts$
       .pipe(
         take(1),
+        takeUntil(this.unsubscribe$),
         map((alerts) => {
           return sortDirection === 'Asc'
             ? alerts.sort((a, b) => a[category] - b[category])
             : alerts.sort((a, b) => b[category] - a[category]);
         })
       )
-      // NOTE : add unsubscribe
       .subscribe((alerts) => {
         this.alertsSubject.next(alerts);
       });
@@ -152,19 +189,18 @@ export class AlertsStore {
     this.alerts$
       .pipe(
         take(1),
+        takeUntil(this.unsubscribe$),
         map((alerts) =>
           alerts.sort((a, b) => a[category].localeCompare(b[category]))
         )
       )
-      // NOTE : add unsubscribe
       .subscribe((alerts) => {
         this.alertsSubject.next(alerts);
       });
   }
 
-  clearDismissed() {
-    this.localStorage
-    .deleteData(this.DISMISSED_ALERTS)
-    this.loadAlerts()
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }
