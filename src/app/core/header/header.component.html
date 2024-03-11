@@ -1,6 +1,7 @@
 <div class="header">
   <div class="logo">Logo</div>
   <div class="user">
+    <button mat-raised-button color="primary" (click)="onButtonClick()"> {{ isLoggedIn ? 'Logout' : 'Login' }}</button>
     <div class="user-name">Marat</div>
     <div class="user-image">SN</div>
   </div>

@@ -1,43 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { Alert } from 'src/app/models/alert';
-import { Observable, tap } from 'rxjs';
-import { AlertsStore } from '../services/alerts.store';
+
+import { Component } from '@angular/core';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss'],
+  styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit {
-  activeAlerts$: Observable<Alert[]>;
-  dismissedAlerts$: Observable<Alert[]>;
+export class MainComponent {
+  isLoggedIn: boolean;
 
-  constructor(private alertsStore: AlertsStore) {}
-
-  ngOnInit(): void {
-    this.getAlerts();
+  constructor(private authService: AuthService, private router: Router) {
+    this.authService.isAuthenticated().subscribe(
+      res => res === true ? this.isLoggedIn = true : this.isLoggedIn = false
+    );
   }
 
-  getAlerts() {
-    this.activeAlerts$ = this.alertsStore.filterByActivity(true);
-    this.dismissedAlerts$ = this.alertsStore
-      .filterByActivity(false)
-      .pipe(tap((al) => console.log('al', al)));
-  }
-
-  sortBy(category: string) {
-    console.log('category :  ', category);
-    this.alertsStore.sortByCategory(category);
-    this.getAlerts();
-  }
-
-  dismissAlert(alert: Alert) {
-    this.alertsStore.dismissAlert(alert);
-    this.getAlerts();
-  }
-
-  clearDismissed() {
-    this.alertsStore.clearDismissed();
-    this.getAlerts();
+  onActionClicked(): void {
+    if (this.isLoggedIn) {
+      this.authService.logout();
+      this.isLoggedIn = false;
+      this.router.navigate(['/login']);
+    }
   }
 }
+
