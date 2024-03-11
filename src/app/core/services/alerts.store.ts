@@ -3,10 +3,11 @@ import {
   BehaviorSubject,
   Observable,
   combineLatest,
+  interval,
   of,
   throwError,
 } from 'rxjs';
-import { catchError, map, take, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, take, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Alert } from 'src/app/models/alert';
 import { LocalStorageService } from './local-storage.service';
@@ -29,6 +30,7 @@ export class AlertsStore {
     private localStorage: LocalStorageService
   ) {
     this.loadAlerts();
+    this.startPolling();
   }
 
   private loadAlerts(): void {
@@ -47,9 +49,17 @@ export class AlertsStore {
       .pipe(take(1))
       .subscribe(([active, dismissed]) => {
         const alerts = active.concat(dismissed);
-        // console.log('alerts ', alerts);
+        console.log('alerts ', alerts);
         this.alertsSubject.next(alerts);
       });
+  }
+
+  private startPolling() {
+    interval(10000).pipe(
+      map(() => {
+        this.loadAlerts();
+      })
+    ).subscribe(alerts => console.log('ALERTS'));
   }
 
   dismissAlert(dismissedAlert: Alert) {
