@@ -18,6 +18,7 @@ import { HttpClient } from '@angular/common/http';
 import { Alert } from 'src/app/models/alert';
 import { LocalStorageService } from './local-storage.service';
 import { Categories } from 'src/app/models/categories';
+import mock from '../../mock/MOCK_DATA.json';
 
 @Injectable({
   providedIn: 'root',

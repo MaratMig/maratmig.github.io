@@ -9,7 +9,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 function addNewAlert() {
-  fs.readFile('data.json', 'utf8', (err: any, data: string) => {
+  fs.readFile('../data.json', 'utf8', (err: any, data: string) => {
     if (err) {
       console.error(err);
       return;
@@ -29,7 +29,7 @@ function addNewAlert() {
 
     alerts.push(newAlert);
 
-    fs.writeFile('data.json', JSON.stringify(alerts), (err: any) => {
+    fs.writeFile('../data.json', JSON.stringify(alerts), (err: any) => {
       if (err) {
         console.error(err);
         return;
@@ -67,7 +67,7 @@ app.post('/api/login', (req, res) => {
 });
 
 app.get('/api/alerts', (req, res) => {
-  fs.readFile('data.json', 'utf8', (err: any, data: string) => {
+  fs.readFile('../data.json', 'utf8', (err: any, data: string) => {
     if (err) {
       console.error(err);
       res.status(500).send('Internal Server Error');
@@ -84,7 +84,7 @@ app.get('/api/alerts', (req, res) => {
 app.post('/api/alerts', (req, res) => {
   const newAlerts = req.body;
 
-  fs.writeFile('data.json', JSON.stringify(newAlerts), (err: any) => {
+  fs.writeFile('../data.json', JSON.stringify(newAlerts), (err: any) => {
     if (err) {
       console.error(err);
       res.status(500).send('Internal Server Error');
@@ -98,7 +98,7 @@ app.put('/api/alerts/:id', (req, res) => {
   const alertId = req.params.id;
   const updatedAlertData = req.body;
 
-  fs.readFile('data.json', 'utf8', (err: any, data: string) => {
+  fs.readFile('../data.json', 'utf8', (err: any, data: string) => {
     if (err) {
       console.error(err);
       res.status(500).send('Internal Server Error');
@@ -113,7 +113,7 @@ app.put('/api/alerts/:id', (req, res) => {
       return;
     }
     alerts[alertIndex] = { ...updatedAlertData };
-    fs.writeFile('data.json', JSON.stringify(alerts), (err: any) => {
+    fs.writeFile('../data.json', JSON.stringify(alerts), (err: any) => {
       if (err) {
         console.error(err);
         res.status(500).send('Internal Server Error');
