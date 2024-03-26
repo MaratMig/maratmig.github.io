@@ -1,7 +1,0 @@
-<div class="widget-container">
-  <h1 class="alerts-header">Active Alerts</h1>
-  <app-alert-cards (alertDismissed)="alertDismissed.emit($event)" [alerts]="activeAlerts" ></app-alert-cards>
-  <div class="divider"></div>
-  <h1 class="alerts-header">Dismissed Alerts</h1>
-  <app-alert-cards [alerts]="dismissedAlerts" ></app-alert-cards>
-</div>

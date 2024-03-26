@@ -74,10 +74,10 @@ app.get('/api/alerts', (req, res) => {
       return;
     }
     const alerts: Alert[] = JSON.parse(data);
-    const activeAlerts = alerts.filter((alert) => {
-      return alert.active === true;
-    });
-    res.json(activeAlerts);
+    // const activeAlerts = alerts.filter((alert) => {
+    //   return alert.active === true;
+    // });
+    res.json(alerts);
   });
 });
 

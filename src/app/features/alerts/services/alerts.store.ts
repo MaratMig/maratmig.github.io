@@ -9,30 +9,40 @@ import {
 } from 'rxjs';
 import {
   catchError,
+  distinctUntilChanged,
   map,
+  switchMap,
   take,
   takeUntil,
   tap,
 } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { Alert } from 'src/app/models/alert';
-import { LocalStorageService } from './local-storage.service';
+import { LocalStorageService } from '../../../core/services/local-storage.service';
 import { Categories } from 'src/app/models/categories';
-import mock from '../../mock/MOCK_DATA.json';
+import mock from '../../../mock/MOCK_DATA.json';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlertsStore {
-  baseUrl = 'http://localhost:3000/api';
+  readonly baseUrl = 'http://localhost:3000/api';
   readonly DISMISSED_ALERTS = 'dismissedAlerts';
+  sortBy = '';
   private unsubscribe$ = new Subject<void>();
 
   private alertsSubject: BehaviorSubject<Alert[]> = new BehaviorSubject<
     Alert[]
   >([]);
-
   alerts$: Observable<Alert[]> = this.alertsSubject.asObservable();
+  private activeAlertsSubject: BehaviorSubject<Alert[]> = new BehaviorSubject<
+    Alert[]
+  >([]);
+  activeAlerts$: Observable<Alert[]> = this.activeAlertsSubject.asObservable();
+  private dismissedAlertsSubject: BehaviorSubject<Alert[]> =
+    new BehaviorSubject<Alert[]>([]);
+  dismissedAlerts$: Observable<Alert[]> =
+    this.dismissedAlertsSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -42,43 +52,87 @@ export class AlertsStore {
     this.startPolling();
   }
 
-  private loadAlerts(): void {
-    const activeAlerts$ = this.http.get<Alert[]>(`${this.baseUrl}/alerts`).pipe(
-      tap((alerts) => this.alertsSubject.next(alerts)),
+  getActiveAlerts(): Observable<Alert[]> {
+    return this.activeAlerts$;
+  }
+
+  getDismissedAlerts(): Observable<Alert[]> {
+    return this.dismissedAlerts$;
+  }
+
+  public loadAlerts(): Observable<Alert[]> {
+    return this.http.get<Alert[]>(`${this.baseUrl}/alerts`).pipe(
+      distinctUntilChanged((prev, curr) =>
+        this.compareAlertsResponse(prev, curr)
+      ),
+      tap((alerts) => {
+        this.alertsSubject.next(alerts);
+        if (this.sortBy !== '') {
+          this.sortByCategory(this.sortBy);
+        }
+        this.activeAlerts$ = this.filterByActivity(true);
+        this.dismissedAlerts$ = this.filterByActivity(false);
+      }),
       catchError((err) => {
         const message = 'Could not load alerts';
         console.log(message, err);
         return throwError(() => new Error(message));
       })
     );
-
-    const dismissedAlerts$ = this.localStorage.loadData(this.DISMISSED_ALERTS);
-    this.combineActiveAndDismissed(activeAlerts$, dismissedAlerts$);
   }
+
+  compareAlertsResponse = (a: Alert[], b: Alert[]) => {
+
+    console.log('a : ', a);
+    console.log('b : ', b);
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    // Sort arrays to ensure objects are in the same order
+    const sortedA = a
+      .slice()
+      .sort((obj1, obj2) => parseInt(obj1.id) - parseInt(obj2.id));
+    const sortedB = b
+      .slice()
+      .sort((obj1, obj2) => parseInt(obj1.id) - parseInt(obj2.id));
+
+    // Compare each object in the arrays
+    for (let i = 0; i < sortedA.length; i++) {
+      if (
+        sortedA[i].id !== sortedB[i].id ||
+        sortedA[i].name !== sortedB[i].name
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  };
 
   private startPolling() {
     interval(10000)
       .pipe(
         takeUntil(this.unsubscribe$),
-        map(() => {
-          this.loadAlerts();
+        switchMap((num) => {
+          return this.loadAlerts();
         })
       )
       .subscribe((alerts) => console.log('ALERTS'));
   }
 
-  combineActiveAndDismissed(
-    activeAlerts$: Observable<Alert[]>,
-    dismissedAlerts$: Observable<Alert[]>
-  ) {
-    combineLatest([activeAlerts$, dismissedAlerts$])
-      .pipe(take(1), takeUntil(this.unsubscribe$))
-      .subscribe(([active, dismissed]) => {
-        const alerts = active.concat(dismissed);
-        console.log('alerts ', alerts);
-        this.alertsSubject.next(alerts);
-      });
-  }
+  // combineActiveAndDismissed(
+  //   activeAlerts$: Observable<Alert[]>,
+  //   dismissedAlerts$: Observable<Alert[]>
+  // ) {
+  //   combineLatest([activeAlerts$, dismissedAlerts$])
+  //     .pipe(take(1), takeUntil(this.unsubscribe$))
+  //     .subscribe(([active, dismissed]) => {
+  //       const alerts = active.concat(dismissed);
+  //       console.log('alerts ', alerts);
+  //       this.alertsSubject.next(alerts);
+  //     });
+  // }
 
   dismissAlert(alert: Alert) {
     console.log('dismissedAlert');
@@ -86,6 +140,7 @@ export class AlertsStore {
     const index = this.findIndexById(alert.id, alerts);
     const dismissedAlert = this.createDismissedAlert(alerts[index]);
     const newAlerts = this.createNewAlers(alerts, dismissedAlert, index);
+    // this.alertsSubject.next(newAlerts);
 
     this.updateLocalStorage(dismissedAlert);
     this.sendAlertDismissRequest(dismissedAlert, newAlerts);
@@ -145,6 +200,7 @@ export class AlertsStore {
   }
 
   sortByCategory(category: string) {
+    this.sortBy = category;
     switch (category) {
       case Categories.SeverityAsc:
         this.sortNumeric('severity', 'Asc');

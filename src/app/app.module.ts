@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from './core/core.module';
 import { HttpClientModule } from '@angular/common/http';
 import { AngularMaterialModule } from './shared/angular-material/angular-material.module';
+import { AlertsModule } from './features/alerts/alerts.module';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { AngularMaterialModule } from './shared/angular-material/angular-materia
     BrowserAnimationsModule,
     CoreModule,
     HttpClientModule,
+    AlertsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

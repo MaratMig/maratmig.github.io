@@ -22,8 +22,8 @@ export class LoginFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      email: ['admin@admin.com', [Validators.required, Validators.email]],
+      password: ['admin', Validators.required],
     });
   }
 
@@ -36,7 +36,7 @@ export class LoginFormComponent implements OnInit {
         .subscribe((logingResult) => {
           console.log('logingResult ', logingResult);
           logingResult === true
-            ? this.router.navigate(['/main'])
+            ? this.router.navigate(['/alerts'])
             : this.router.navigate(['/login']);
         });
     }

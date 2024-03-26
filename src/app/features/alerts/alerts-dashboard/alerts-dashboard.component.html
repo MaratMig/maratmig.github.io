@@ -1,0 +1,10 @@
+<div class="main">
+  <app-filters (filter)="sortBy($event)"></app-filters>
+  <div class="widget-container">
+    <h1 class="alerts-header">Active Alerts</h1>
+    <app-alert-cards (alertDismissed)="dismissAlert($event)" [alerts]="(activeAlerts$ | async)" ></app-alert-cards>
+    <div class="divider"></div>
+    <h1 class="alerts-header">Dismissed Alerts</h1>
+    <app-alert-cards [alerts]="(dismissedAlerts$ | async)" ></app-alert-cards>
+  </div>
+</div>
